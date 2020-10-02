@@ -4,9 +4,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 
 class MainActivity : AppCompatActivity() {
     private lateinit var gameScoreTextView: TextView
@@ -33,7 +37,11 @@ class MainActivity : AppCompatActivity() {
         gameScoreTextView = findViewById(R.id.game_score_text_view)
         timeLeftTextView = findViewById(R.id.time_left_text_view)
         tapMeButton = findViewById(R.id.tap_me_button)
-        tapMeButton.setOnClickListener { incrementScore() }
+        tapMeButton.setOnClickListener { v ->
+            val bounceAnimation = AnimationUtils.loadAnimation(this, R.anim.bounce)
+            v.startAnimation(bounceAnimation)
+            incrementScore()
+        }
         if (savedInstanceState != null){
             score = savedInstanceState.getInt(SCORE_KEY)
             timeLeft = savedInstanceState.getInt(TIME_LEFT_KEY)
@@ -77,6 +85,29 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         Log.d(TAG, "onDestroy Called")
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        super.onCreateOptionsMenu(menu)
+        menuInflater.inflate(R.menu.menu,menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.about_item){
+            showInfo()
+        }
+        return true
+    }
+
+    private fun showInfo() {
+        val dialogTitle = getString(R.string.aboout_title, BuildConfig.VERSION_NAME)
+        val dialogMessage = getString(R.string.about_message)
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(dialogTitle)
+        builder.setMessage(dialogMessage)
+        builder.create().show()
+    }
+
     private fun incrementScore(){
         if (!gameStarted){
          startGame()
